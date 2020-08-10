@@ -1,0 +1,211 @@
+---
+title: "python5"
+author: "Levi Orero"
+date: "5/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+```
+
+##R
+```{r}
+my_list <- list('monday', 'specter', 24, TRUE)
+typeof(my_list)
+```
+
+##Python
+```{python}
+my_list = ['monday', 'specter', 24, True]
+type(my_list)
+```
+```{python}
+import pandas as pd
+pd_list = pd.Series(my_list)
+pd_list
+```
+##R
+```{r}
+new_list <-  list(roll_number = 1:10, Start_Name = LETTERS[1:10])
+new_list[1]
+new_list['roll_number']
+new_list[[1]]
+```
+##Python
+```{python}
+new_list = pd.Series({'Roll_number' : range(1,10), 'Start_Name' : map(chr, range(65,70))})
+```
+```{python}
+new_list
+```
+```{python}
+new_list['Roll_number']
+new_list.Roll_number
+```
+
+```{r}
+my_mat <- matrix(1:10, nrow = 5)
+my_mat
+# to select first row
+my_mat[1,]
+# to select second column
+my_mat[,2]
+```
+
+```{python}
+import numpy as np
+a = np.array(range(10,15))
+b = np.array(range(20,25))
+c = np.array(range(30,35))
+my_mat = np.column_stack([a,b,c])
+```
+#To select first row
+```{python}
+my_mat[0,]
+my_mat[:,1] #second column
+```
+# DATA FRAMES
+##R
+```{r}
+data_set <- data.frame(Name = c("Sam","Paul","Tracy","Peter"),
+                       Hair_Colour = c("Brown","White","Black","Black"),
+                       Score = c(45,89,34,39))
+```
+##Python
+```{python}
+data_set = pd.DataFrame({'Name' : ["Sam","Paul","Tracy","Peter"],
+'Hair_Colour': ["Brown", "White", "Black","Black"],
+'Score' : [45,89,34,39]})
+data_set.shape
+```
+##R
+```{r}
+#select first column in R
+data_set$Name
+data_set[["Name"]]
+data_set[1]
+
+
+```
+
+```{python}
+data_set['Name']
+data_set.Name
+data_set[1,]
+```
+##R
+```{r}
+data_set[c("Name","Hair_Colour")]
+data_set[,c("Name","Hair_Colour")]
+```
+```{python}
+data_set[['Name','Hair_Colour']]
+data_set.loc[:,['Name','Hair_Colour']]
+```
+
+# *Practicing Python on a Data Set*
+```{python}
+#import libraries
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_boston
+```
+
+```{python}
+#store in a variable
+boston = load_boston()
+```
+
+```{python}
+boston.keys()
+```
+```{python}
+print(boston['feature_names'])
+```
+```{python}
+print(boston['DESCR'])
+```
+```{python}
+bos_data = pd.DataFrame(boston['data'])
+```
+
+```{python}
+bos_data.head()
+```
+
+```{python}
+bos_data.columns = boston['feature_names']
+bos_data.head()
+```
+```{python}
+bos_data.describe()
+```
+```{python}
+#get first 10 rows
+bos_data.iloc[:10,:10]
+```
+```{python}
+#select first 5 columns
+bos_data.loc[:,'CRIM':'NOX']
+bos_data.iloc[:,:5]
+```
+```{python}
+#filter columns bases on a condition
+bos_data.query("CRIM > 0.05 & CHAS == 0")
+```
+```{python}
+#SAMPLE the data set
+bos_data.sample(n = 10)
+```
+```{python}
+#sort values when the default is ascending
+bos_data.sort_values(['CRIM']).head()
+bos_data.sort_values(['CRIM'],ascending=False).head()
+```
+```{python}
+bos_data.rename(columns = {'CRIM' : 'CRIM_NEW'})
+```
+```{python}
+#find mean of selected columns
+bos_data[['ZN','RM']].mean()
+```
+```{python}
+#transform a numeric data into categorical
+bos_data['ZN_Cat'] = pd.cut(bos_data['ZN'],bins = 5, labels = ['a','b','c','d','e'])
+```
+
+```{python}
+#calculate the mean age for the ZN_Cat variable
+bos_data.groupby('ZN_Cat')['AGE'].median()
+```
+```{python}
+#create a new categorical variable
+bos_data['NEW_AGE'] = pd.cut(bos_data['AGE'], bins = 3, labels = ['Young','Old','Very_Old'])
+```
+```{python}
+#pivot table calculating mean age per ZN_Cat variable
+bos_data.pivot_table(values = 'DIS', index = 'ZN_Cat',columns = 'NEW_AGE', aggfunc = 'mean')
+```
+
+# IRIS DATA SET
+```{python}
+# import dataset
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+
+```
+
+```{python}
+#store in a variable
+iris = load_iris()
+
+```
+
+```{python}
+#get description of the dictionary
+iris.keys()
+```
+

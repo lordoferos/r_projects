@@ -1,0 +1,38 @@
+---
+title: "python3"
+author: "Levi Orero"
+date: "5/2/2020"
+output: html_document
+---
+
+# Python Programming in R
+# Load reticulate package
+```{r}
+library(reticulate)
+```
+
+
+```{python}
+import quandl
+import sys
+```
+
+```{python}
+mydata = quandl.get("WIKI/AAPL")
+```
+
+# Check the data
+```{python}
+mydata.shape
+
+mydata.head(10)
+
+```
+
+
+
+
+```{r}
+mydata
+```
+

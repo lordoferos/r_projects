@@ -1,0 +1,717 @@
+---
+title: "python4"
+author: "Levi Orero"
+date: "5/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Import library
+## R
+```{r, message=FALSE}
+library(readr)
+library(ggplot2)
+library(dplyr)
+```
+
+## Python
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import warnings
+warnings.filterwarnings("ignore")
+import matplotlib.pyplot as plt
+sns.set(style = "white", color_codes = True)
+
+```
+
+# Creating a DataFrame
+## R
+```{r}
+dates <- seq(as.Date("2013/01/01"), by = "day", length.out = 6)
+
+df <- data.frame(date = dates, 
+                 A = runif(6),
+                 B = runif(6),
+                 C = runif(6),
+                 D = runif(6))
+
+df
+```
+
+## Python
+```{python}
+dates = pd.date_range('20130101',periods = 6)
+df = pd.DataFrame(np.random.randn(6,4), index = dates, columns = list('ABCD'))
+df
+```
+
+## R
+```{r}
+dates <- as.Date("2013/01/01")
+df2 <- data.frame(date = dates,
+                  A = 1,
+                  B = runif(4),
+                  C = runif(4),
+                  D = runif(4),
+                  E = c("test", "train","test","train"),
+                  F = "foo")
+df2
+```
+
+## Python
+```{python}
+df2 = pd.DataFrame({
+'A':1.,
+'B':pd.Timestamp('20130102'),
+'C':pd.Series(1,index=list(range(4)),dtype='float32'),
+'D':np.array([3]*4,dtype='int32'),
+'E':pd.Categorical(["test","train","test","train"]),
+'F':'foo'})
+df2
+```
+
+## R
+```{r}
+sapply(df, class)
+```
+
+## Python
+```{python}
+df2.dtypes
+```
+
+# Viewing Data
+## R
+```{r}
+head(df)
+tail(df,3)
+dim(df)
+nrow(df)
+ncol(df)
+```
+## Python
+```{python}
+df.head()
+df.tail(3)
+df.shape
+
+```
+```{python}
+df.columns
+```
+
+## R
+```{r}
+summary(df)
+```
+
+## Python
+```{python}
+#Describe shows a quick summary of your data
+df.describe()
+```
+
+## R
+```{r}
+t(df)
+```
+
+## Python
+```{python}
+df.T
+```
+
+## R
+```{r}
+df[order(df$B),] #sort values
+```
+
+## Python
+```{python}
+df.sort_values(by='B')
+```
+
+# Data Manipulation
+## R
+```{r}
+df[,c('A')]
+```
+
+## Python
+```{python}
+df['A']
+```
+
+## R
+```{r}
+df[c(1:3),]
+```
+## Python
+```{python}
+df[0:3]
+```
+
+## R
+```{r}
+df[df$date >= '2013-01-02' & df$date <= '2013-01-04',]
+```
+## Python
+```{python}
+df['20130102':'20130104']
+```
+
+# Selection by Label
+## R
+```{r}
+df[,c('A','B')]
+```
+## Python
+```{python}
+df.loc[:,['A','B']]
+```
+
+## R
+```{r}
+df[df$date >= '2013-01-02' & df$date <= '2013-01-04', c('A','B')]
+```
+
+## Python
+```{python}
+df.loc['20130102':'20130104',['A','B']]
+```
+
+## R
+```{r}
+df[(df$date == '2013-01-02'), c('A','B')]
+```
+
+## Python
+```{python}
+df.loc['20130102',['A','B']]
+```
+
+# Selection by Position
+## R
+```{r}
+df[3,]
+```
+## Python
+```{python}
+df.iloc[3]
+```
+
+## R
+```{r}
+df[3:5,1:3]
+```
+
+## Python
+```{python}
+df.iloc[2:5,0:2]
+```
+
+## R
+```{r}
+df[c(2,3,5),c(1,3)]
+```
+
+## Python
+```{python}
+df.iloc[[1,2,4],[0,2]]
+```
+## R
+```{r}
+df[c(2:4),]
+```
+
+## Python
+```{python}
+df.iloc[1:3,:]
+```
+
+## R
+```{r}
+df[,c(2:4)]
+```
+## Python
+```{python}
+df.iloc[:,1:3]
+```
+
+## R
+```{r}
+df[2,2]
+```
+## Python
+```{python}
+df.iloc[1,1]
+```
+
+## R
+```{r}
+df[2,2]
+```
+## Python
+```{python}
+df.iat[1,1]
+```
+
+## R
+```{r}
+df[df$A>0,]
+```
+## Python
+```{python}
+df[df.B > 0.8]
+```
+
+## R
+```{r}
+df2 <- df
+df2$E <- c('one','one','two','three','four','three')
+df2
+```
+## Python
+```{python}
+df2 = df.copy()
+df2['E'] = ['one', 'one','two', 'three','four','three']
+df2
+```
+
+# Dealing with Missing Data
+## R
+```{r}
+dates <- seq(
+  as.Date("2013/01/01"),
+  by = "day",
+  length.out = 6)
+
+df1 <- data.frame(date = dates[1:4])
+df1 <- cbind(df1,df[1:4,c('A','B','C','D')])
+df1$E <- 1
+df1[3:4,'E'] <- NA
+df1
+
+```
+## Python
+```{python}
+df1 = df.reindex(index = dates[0:4],
+columns = list(df.columns) + ['E'])
+
+df1.loc[dates[0]:dates[1],'E'] = 1
+df1
+```
+
+## R
+```{r}
+#Drop missing data in R
+na.omit(df1)
+```
+
+## Python
+```{python}
+df1.dropna(how = 'any')
+```
+
+## R - Fill in missing data
+```{r}
+df2 <- df1
+df1[is.na(df1)] <- 5
+df1
+```
+## Python
+```{python}
+df1.fillna(value=3)
+```
+
+## R
+```{r}
+is.na(df2)
+```
+## Python
+```{python}
+pd.isnull(df1)
+```
+
+# Statistical Operations
+## R
+```{r}
+sapply(df[,-1],mean, na.rm = T)
+```
+## Python
+```{python}
+df.mean()
+```
+## R
+```{r}
+data.frame(ID = df[,1], Means = rowMeans(df[,-1]))
+```
+## Python
+```{python}
+df.mean(1)
+```
+
+# String Methods
+## R
+```{r}
+s <- c('A','B','C','Aaba','Baca',NA,'CABA','dog','cat')
+tolower(s)
+```
+
+## Python
+```{python}
+s = pd.Series(['A','B','C','Aaba','Baca',np.nan,'CABA','dog','cat'])
+s.str.lower()
+```
+# Data frames Merge operation
+## R
+```{r}
+df <- data.frame(
+  A = runif(10),
+  B = runif(10),
+  C = runif(10),
+  D = runif(10))
+df
+
+```
+## Python
+```{python}
+df = pd.DataFrame(np.random.randn(10,4))
+df
+```
+## R
+```{r}
+a <- df[1:3,]
+b <- df[3:7,]
+c <- df[7:10,]
+
+rbind(a,b,c)
+```
+## Python
+```{python}
+pieces = [df[:3],df[3:7],df[7:]]
+pd.concat(pieces)
+df[:3]
+df[3:7]
+pieces
+```
+
+# Join data frames
+## R
+```{r}
+left <- data.frame(key = 'foo',
+                   lval = c(1,2))
+right <- data.frame(key = 'foo',
+                    lval = c(4,5))
+left
+right
+```
+## Python
+```{python}
+left = pd.DataFrame({'key': ['foo','foo'],'lval': [1,2]})
+right = pd.DataFrame({'key':['foo','foo'],'rval':[4,5]})
+```
+
+## R
+```{r}
+merge(x = left, y = right, by = "key", all = TRUE)
+```
+
+## Python
+```{python}
+pd.merge(left, right, on = 'key')
+```
+
+# Import dataset
+```{r}
+data <- read_csv('boston_test_data.csv')
+```
+## Python
+```{python}
+data_p = pd.read_csv('boston_test_data.csv')
+```
+
+## R
+```{r}
+str(data)
+```
+## Python
+```{python}
+data_p.info()
+```
+## R
+```{r}
+colnames(data)
+```
+
+## Python
+```{python}
+data_p.columns
+```
+
+## R
+```{r}
+head(data)
+```
+## Python
+```{python}
+data_p.head(6)
+```
+
+## R
+```{r}
+series <- data[,c('indus')]
+print(class(series))
+```
+## Python
+```{python}
+series = data_p['indus']
+print(type(series))
+```
+
+## R
+```{r}
+x = data[data$zn > 70,]
+x
+```
+
+## Python
+```{python}
+x = data_p['zn']>70
+data_p[x]
+```
+## R
+```{r}
+#Filtering with logic in R
+x = data[data$zn > 70 & data$age <30,]
+x
+```
+## Python
+```{python}
+data_p[np.logical_and(data_p['zn']>70,data_p['age']<30)]
+data_p[(data_p['zn']>70) & (data_p['age']<30)]
+```
+
+# Exploratory Data Analysis
+## R
+```{r}
+data %>% 
+  group_by(rad) %>% 
+  summarise(count = n())
+```
+
+## Python
+```{python}
+print(data_p['rad'].value_counts(dropna = False))
+data_p.describe()
+```
+
+# CONCATENATING DATA
+## R
+```{r}
+data1 <- head(data)
+data2 <- tail(data)
+conc_data_row <- rbind(data1,data2)
+conc_data_row
+```
+## Python
+```{python}
+data1 = data_p.head()
+data2 = data_p.tail()
+conc_data_row = pd.concat([data1,data2],axis = 0, ignore_index = True)
+conc_data_row
+```
+##R
+```{r}
+data1 <- head(data$crim)
+data2 <- head(data$indus)
+conc_data_col <- cbind(data1,data2)
+conc_data_col
+```
+##Python
+```{python}
+data1 = data['crim'].head()
+data2 = data['indus'].head()
+conc_data_col = pd.concat([data1,data2],axis = 1)
+conc_data_col
+```
+##R
+```{r}
+data[2,c("tax")]
+```
+##Python
+```{python}
+data["tax"][0]
+data.loc[1,['tax']]
+```
+##R
+```{r}
+#Select specific columns
+data[,c("tax","indus")]
+```
+##Python
+```{python}
+data[["tax","indus"]]
+```
+##R
+```{r}
+data[1:10,c("tax","indus")]
+```
+##Python
+```{python}
+data.loc[1:10,"tax":"black"]
+```
+##R
+```{r}
+data[1:10,9:11]
+```
+##Python
+```{python}
+data.loc[1:10,"rad":"black"]
+```
+
+# FILTERING DATA FRAMES
+##R
+```{r}
+data %>%
+  filter(rad > 2)
+```
+##Python
+```{python}
+boolean = data.rad > 2
+data[boolean]
+```
+##R
+```{r}
+data %>%
+  filter(data$zn > 25 & data$nox < 0.5)
+```
+##Python
+```{python}
+fil_1 = data.zn > 25
+fil_2 = data.nox < 0.5
+data[fil_1 & fil_2]
+```
+
+##R
+```{r}
+data %>%
+  filter(zn < 50) %>%
+  select(rad)
+```
+##Python
+```{python}
+data.rad[data.zn <50]
+```
+
+##R
+```{r}
+data$tant = data$zn + data$tax
+head(data)
+```
+##Python
+```{python}
+data["tant"] = data.zn + data.tax
+data.head()
+```
+```{python}
+data.sort_values('tax',ascending = False)
+```
+##R
+```{r}
+library(corrplot)
+nums <- sapply(data,is.numeric)
+M <- cor(data[,nums])
+corrplot.mixed(M)
+```
+##Python
+```{python}
+f,ax = plt.subplots(figsize = (18,18))
+sns.heatmap(data.corr(),annot=True, linewidths=.5, fmt='.1f',ax=ax)
+```
+##R
+```{r}
+ggplot(data = data, aes(x=ptratio,group = 1))+
+  geom_line(aes(y = black), linetype = "dashed", col = "red")+
+  geom_line(aes(y = tax), linetype = "solid", color = "green")+
+  labs(x = "X-axis", y = "Y-axis", title = "Line Plot")
+```
+
+##Python
+```{python}
+data.black.plot(kind = 'line', color = 'g', label = 'Blackness',linewidth=1, alpha=1, grid=True, linestyle=':')
+data.tax.plot(color ='r', label='Tax amount', linewidth=1,alpha=1,grid=True, linestyle ='-.')
+plt.legend(loc='upper right')
+```
+
+##R
+```{r}
+ggplot(data = data, aes(x = ptratio, y = tax, group = 1))+
+  geom_point(col = "red") +
+  labs(title = "Black tax scatter plot")
+```
+##Python
+```{python}
+data.plot(kind = 'scatter', x = 'ptratio', y = 'tax', alpha = 0.5, color = 'red')
+plt.xlabel('Blackness')
+plt.ylabel('Tax')
+plt.title('Black tax scatter plot')
+```
+
+##R
+```{r}
+hist(data$tax, breaks = 100, main = 'Histogram of tax', col = 'blue')
+```
+```{python}
+data.tax.plot(kind = 'hist', bins = 100, figsize = (5,5))
+plt.show()
+```
+
+##R
+```{r}
+boxplot(data[,c(7:14)], las = 2)
+```
+##Python
+```{python}
+data.boxplot(column='tax', by = 'rad')
+plt.show()
+```
+##R
+```{r}
+#Plotting all data
+a <- ggplot(data = data, aes(x = ptratio)) +
+  geom_line(aes(y = tax), col = "red")+
+  geom_line(aes(y = black), col = "green")+
+  geom_line(aes(y = tant), col = "blue")+
+  labs(x = "X-axis",
+       y = "Y-axis",
+       title = "Line Plot")
+
+b <- ggplot(data = data, aes(x = ptratio)) +
+  geom_line(aes(y = tant), col = "red")
+
+c <- ggplot(data = data, aes(x = ptratio))+
+  geom_line(aes(y = black) , col = "green")
+
+d <- ggplot(data = data, aes(x = ptratio))+
+  geom_line(aes(y = tax), col = "blue")
+
+library(gridExtra)
+
+grid.arrange(a,b,c,d,nrow = 4, ncol = 1)
+              
+  
+```
+##Python
+```{python}
+data1 = data.loc[:,["tant","tax","black"]]
+data1.plot()
+data1.plot(subplots = True)
+plt.show()
+```
+
