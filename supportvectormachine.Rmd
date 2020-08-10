@@ -1,0 +1,107 @@
+---
+title: "Support Vector Machine"
+author: "Levi Orero"
+date: "5/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Machine learning is a science of getting computers to act by feeding them data and letting them learn a few tricks on their own, without being explicitly programmed to do so.
+
+_Supervised learning_
+_Unsupervised learning_
+_Reinforcement learning_
+
+*Problem Statement*
+To study a heart disease data set and to model a classifier for predicting whether a patient is suffering from any heart disease or not
+
+#Load packages
+```{r , message=FALSE}
+library(caret)
+library(readr)
+```
+#Import data
+```{r}
+heart <- read_csv("heart.csv")
+```
+
+```{r}
+str(heart)
+head(heart)
+heart <- data.frame(heart)
+```
+
+#Split data
+```{r}
+intrain <- createDataPartition(y = heart$target, p = 0.7, list = FALSE)
+training <- heart[intrain,]
+testing <- heart[-intrain,]
+
+#check sets
+dim(training)
+dim(testing)
+                               
+```
+#Clean data
+```{r}
+anyNA(heart)
+summary(heart)
+```
+```{r}
+training[["target"]] = factor((training[["target"]]))
+```
+
+#train model
+```{r}
+trctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+#method defines resampling method
+#number is the number of resampling iterations
+#repeats contains sets to compute for our repeated cross validation
+
+svm_Linear <- train(target ~.,data = training, method = "svmLinear",
+                    trControl = trctrl, 
+                    preProcess = c("center","scale"),
+                    tunelength = 10)
+                       
+```
+#check output
+```{r}
+svm_Linear
+```
+
+```{r}
+#test data
+test_pred <- predict(svm_Linear, newdata = testing)
+test_pred
+```
+
+```{r}
+#use confusion matrix to test accuracy of the model
+confusionMatrix(table(test_pred, testing$target))
+```
+Output shows that our model accuracy is 80%
+```{r}
+grid <- expand.grid(C = c(0,0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1,
+                          1.25, 1.5, 1.75, 2, 5))
+svm_Linear_Grid <- train(target~., data = training, method = "svmLinear",
+                        trControl = trctrl,
+                        preProcess = c("center", "scale"),
+                        tuneGrid = grid,
+                        tuneLength = 10)
+svm_Linear_Grid
+plot(svm_Linear_Grid)
+```
+The above plot is showing that our clasifier is giving best accuracy on C = 0.1. Let's make predictions using this model for our test set.
+```{r}
+test_pred_grid <- predict(svm_Linear_Grid, newdata = testing)
+test_pred_grid
+```
+
+Check accuracy using confusion matrix
+```{r}
+confusionMatrix(table(test_pred_grid, testing$target))
+```
+
