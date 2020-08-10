@@ -1,6 +1,6 @@
 ---
 title: "python3"
-author: "Levi Orero"
+author: "LORD"
 date: "5/2/2020"
 output: html_document
 ---
