@@ -6,6 +6,8 @@ allo <- google_analytics(ga_id,
                            "percentNewSessions","percentNewVisits",
                            "dayUsers","7dayUsers"))
 
+# Assigned a value to ga_id
+
 allo2 <- google_analytics(ga_id,
                                                    date_range = c("2017-05-01","2020-05-15"),
                                                    metrics = c(
